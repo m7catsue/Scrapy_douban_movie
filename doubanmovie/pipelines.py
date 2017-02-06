@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
+# Item pipeline作用: 清洗数据;保存到数据库;
 # Item pipelines range: 0-1000. Items go through from lower valued to higher valued classes.
 # 如果scrapy需要运行多个间断的session，则需要自定义CustomRequestFilter和FilterDuplicatePipeline从数据库中获得已保存的item(url)
 
 import logging
 import pymongo
-from scrapy.utils.project import get_project_settings                               # To get settings from settings.py
-from scrapy.exceptions import DropItem
+from scrapy.utils.project import get_project_settings     # To get settings from settings.py
+from scrapy.exceptions import DropItem                    # 通过抛出DropItem exception来扔掉item,后续pipeline将不会收到被扔掉的item
 from twisted.enterprise import adbapi
 
 
@@ -130,12 +131,4 @@ class MongodbPipeline(object):
         except Exception:
             logging.info('*** Insert operation (MongoDB) failed: %s ***\n' % item['url'])
             return item
-
-
-
-
-
-
-
-
 

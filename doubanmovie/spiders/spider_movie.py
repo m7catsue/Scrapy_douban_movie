@@ -11,14 +11,14 @@ class DoubanMovieSpider(scrapy.Spider):
     """
     DoubanMovieSpider 抓取豆瓣电影页面信息
     """
-    name = "motion"                                                           # scrapy shell命令使用的是spider name 'basic'
+    name = "motion"                                                          # scrapy shell命令使用的是spider name 'basic'
     allowed_domains = ["movie.douban.com"]                                   # allowed_domains加‘https://’和'/'等字符会被offsite filter过滤掉
 
     def start_requests(self):
         """从豆瓣电影首页 和 豆瓣电影top250 获取首批url"""
         yield scrapy.Request('https://movie.douban.com/', callback=self.parse_front_page)
 
-        for x in xrange(0, 250, 25):                                          # 豆瓣top250的10个index页面(0，25，50...225)
+        for x in xrange(0, 250, 25):                                         # 豆瓣top250的10个index页面(0，25，50...225)
             yield scrapy.Request(
                 ('https://movie.douban.com/top250?start=%s&filter=' % x), callback=self.parse_top250_index_page)
 
@@ -39,9 +39,9 @@ class DoubanMovieSpider(scrapy.Spider):
 
     def parse(self, response):
         """
-        parse一个具体豆瓣电影的页面；
-        response.xpath("somexpath").extract()若是xpath路径取不到，则返回为[]，不会有exception
-        以下@开头的是scrapy的contract，在命令行输入scrapy check basic来检验spider的功能
+        parse一个具体豆瓣电影的页面;
+        response.xpath("somexpath").extract()若是xpath路径取不到，则返回为[]，不会有exception;
+        以下@开头的是scrapy的contract，在命令行输入scrapy check basic来检验spider的功能;
 
         @url https://movie.douban.com/subject/4811813/
         @returns items 1
@@ -51,7 +51,7 @@ class DoubanMovieSpider(scrapy.Spider):
         # 取得下一波需要跳转到的url的response(由request返回)
         for next_page_url in response.xpath(
                 "//*[@id='recommendations']/div[@class='recommendations-bd']/dl/dd/a/@href").extract():
-            yield scrapy.Request(next_page_url, callback=self.parse)                # yield response with callback
+            yield scrapy.Request(next_page_url, callback=self.parse)           # yield response with callback
 
         l = ItemLoader(item=DoubanmovieItem(), response=response)
 
@@ -69,11 +69,11 @@ class DoubanMovieSpider(scrapy.Spider):
         l.add_xpath('image_url', "//*[@id='mainpic']/a/img/@src")               # 电影海报图片链接
 
         # Housekeeping fields
-        l.add_value('url', response.url)                                            # 当前页面url(未标准化的)
+        l.add_value('url', response.url)                                        # 当前页面url(未标准化的)
         l.add_value('project', self.settings.get('BOT_NAME'))
         l.add_value('spider', self.name)
         l.add_value('server', socket.gethostname())
-        l.add_value('datetime', time.strftime("%Y-%m-%d %H:%M:%S"))              # 当前时间
+        l.add_value('datetime', time.strftime("%Y-%m-%d %H:%M:%S"))             # 当前时间
 
         yield l.load_item()
 
